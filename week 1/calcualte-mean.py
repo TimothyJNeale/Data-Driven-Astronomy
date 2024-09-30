@@ -18,9 +18,9 @@ def calculate_mean(data):
     return mean 
 
 # Call the function and print the result
-print(sum(data))
-print (len(data))
-print(calculate_mean(data))
+print("Sum of list: ",sum(data))
+print ("Length of list: ",len(data))
+print("The mean calculated via procedure: ",calculate_mean(data))
 
 '''
 Output: 
@@ -28,3 +28,5 @@ Output:
 5
 2.96
 '''
+
+print("The mean of the list calculated with numpy is: ", np.mean(data))
