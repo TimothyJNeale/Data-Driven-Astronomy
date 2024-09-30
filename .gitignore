@@ -12,6 +12,9 @@ venv.bak/
 /dev/*
 .vscode/
 
+# Ignore FITS data files as likely only used for expmle data
+*.fits 
+
 # Ignore Python bytecode
 /__pycache__
 __pycache__/
