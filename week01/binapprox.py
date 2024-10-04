@@ -51,7 +51,7 @@ def median_bins(values, B):
 
 def median_approx(values, B):
     '''
-    THis function uses median_bins to estimate the median value of a list of values.
+    This function uses median_bins to estimate the median value of a list of values.
     '''
     mean, std, ignore_bin, bin_counts = median_bins(values, B)
     N = len(values)
