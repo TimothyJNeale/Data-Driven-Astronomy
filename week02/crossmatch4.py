@@ -16,13 +16,12 @@ on the celestial sphere.
 import numpy as np
 import time
 
-# Caalculate the angular distance between two objects with inputs in radians
+# Caalculate the angular distance between two objects with inputs in radians and output in radians
 def angular_dist(ra1, dec1, ra2, dec2):
     a = np.sin(np.abs(dec1 - dec2)/2)**2
     b = np.cos(dec1)*np.cos(dec2)*np.sin(np.abs(ra1 - ra2)/2)**2
-    d = 2*np.arcsin(np.sqrt(a + b))
     
-    return np.degrees(d)
+    return 2*np.arcsin(np.sqrt(a + b))
 
 
 def crossmatch(cat1, cat2, max_radius):
@@ -31,6 +30,8 @@ def crossmatch(cat1, cat2, max_radius):
     Each row contains the coordinates of a single object. 
     The two columns are the RA and declination.
     '''
+    max_radius = np.radians(max_radius)
+    
     # time at the start of the function
     start_time = time.perf_counter()
 
@@ -42,19 +43,18 @@ def crossmatch(cat1, cat2, max_radius):
     cat2 = np.radians(cat2)
 
     for id1, (ra1, dec1) in enumerate(cat1):
-        min_dist = np.inf
         min_id = None
 
-        for id2, (ra2, dec2) in enumerate(cat2):
-            dist = angular_dist(ra1, dec1, ra2, dec2)
-            if dist < min_dist:
-                min_id = id2
-                min_dist = dist
-                
+        ra2s = cat2[:, 0]
+        dec2s = cat2[:, 1]
+        dists = angular_dist(ra1, dec1, ra2s, dec2s)
+        min_dist = np.min(dists)
+        min_id = np.argmin(dists)
+
         if min_dist > max_radius:
             no_matches.append(id1)
         else:
-            matches.append((id1, min_id, float(min_dist)))
+            matches.append((id1, int(min_id), float(min_dist)))
 
     # time at the end of the function
     end_time = time.perf_counter()
@@ -70,21 +70,27 @@ def create_cat(n):
     return np.hstack((ras, decs))
 
 
+ra1, dec1 = np.radians([180, 30])
+cat2 = [[180, 32], [55, 10], [302, -44]]
+cat2 = np.radians(cat2)
+ra2s, dec2s = cat2[:,0], cat2[:,1]
+dists = angular_dist(ra1, dec1, ra2s, dec2s)
+print(np.degrees(dists))
+
+
 cat1 = np.array([[180, 30], [45, 10], [300, -45]])
 cat2 = np.array([[180, 32], [55, 10], [302, -44]])
-
-
 matches, no_matches, time_taken = crossmatch(cat1, cat2, 5)
 print('matches:', matches)
 print('unmatched:', no_matches)
 print('time taken:', time_taken)
 
 
-# Test your function on random inputs
-np.random.seed(0)
-cat1 = create_cat(1000)
-cat2 = create_cat(1000)
-matches, no_matches, time_taken = crossmatch(cat1, cat2, 5)
-print('matches:', matches)
-print('unmatched:', no_matches)
-print('time taken:', time_taken)
+# # Test your function on random inputs
+# np.random.seed(0)
+# cat1 = create_cat(1000)
+# cat2 = create_cat(1000)
+# matches, no_matches, time_taken = crossmatch(cat1, cat2, 5)
+# print('matches:', matches)
+# print('unmatched:', no_matches)
+# print('time taken:', time_taken)
